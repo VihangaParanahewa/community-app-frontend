@@ -1,5 +1,6 @@
 // src/pages/Profile.js
 import { useState } from 'react';
+import {useAuthContext} from "../context/AuthContext";
 
 const ProfileTab = ({ title, active, onClick }) => (
   <button
@@ -41,8 +42,9 @@ const SkillBadge = ({ skill, level, onEndorse }) => {
 function Profile() {
   const [activeTab, setActiveTab] = useState('about');
   const [editing, setEditing] = useState(false);
+  const authContext = useAuthContext();
   const [user] = useState({
-    name: "Sarah Chen",
+    name: authContext.currentUser.displayName,
     tagline: "Community Builder | Garden Enthusiast | Tech Mentor",
     location: "Downtown East",
     availableForHelp: true,

@@ -1,10 +1,10 @@
 
 // src/pages/Register.js
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import {useEffect, useState} from 'react';
+import { Link } from 'react-router-dom';
+import { useRegistration } from '../hooks/useRegistration';
 
 function Register() {
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -13,11 +13,26 @@ function Register() {
     interests: '',
     bio: ''
   });
+  const { isRegistered, error, isPending, signup} = useRegistration()
+
+  // Effect to reset form if user registered
+  useEffect(() => {
+    if (isRegistered) {
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        location: '',
+        interests: '',
+        bio: ''
+      });
+    }
+  }, [isRegistered]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add Firebase auth here
-    navigate('/create-profile');
+    console.log('Form submitted:', formData);
+    await signup(formData);
   };
 
   return (
@@ -36,6 +51,7 @@ function Register() {
             <input
               type="text"
               required
+              value={formData.name}
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               onChange={(e) => setFormData({...formData, name: e.target.value})}
             />
@@ -48,6 +64,7 @@ function Register() {
             <input
               type="email"
               required
+              value={formData.email}
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               onChange={(e) => setFormData({...formData, email: e.target.value})}
             />
@@ -60,6 +77,7 @@ function Register() {
             <input
               type="password"
               required
+              value={formData.password}
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               onChange={(e) => setFormData({...formData, password: e.target.value})}
             />
@@ -73,6 +91,7 @@ function Register() {
               type="text"
               required
               placeholder="Your neighborhood or area"
+              value={formData.location}
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               onChange={(e) => setFormData({...formData, location: e.target.value})}
             />
@@ -85,6 +104,7 @@ function Register() {
             <input
               type="text"
               placeholder="e.g., gardening, reading, cooking"
+              value={formData.interests}
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               onChange={(e) => setFormData({...formData, interests: e.target.value})}
             />
@@ -97,17 +117,32 @@ function Register() {
             <textarea
               rows={3}
               placeholder="Tell us a bit about yourself..."
+              value={formData.bio}
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               onChange={(e) => setFormData({...formData, bio: e.target.value})}
             />
           </div>
 
-          <button
+          {!isPending && <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
           >
             Create Account
-          </button>
+          </button>}
+          {isPending && <button
+              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700" disabled>
+            Loading .....
+          </button>}
+          {error && (
+              <p style={{ backgroundColor: 'red', color: 'white', padding: '10px', borderRadius: '5px' }}>
+                {error}
+              </p>
+          )}
+          {isRegistered && (
+              <p style={{ backgroundColor: 'green', color: 'white', padding: '10px', borderRadius: '5px' }}>
+                User Registered Successfully !
+              </p>
+          )}
         </form>
 
         <p className="text-center mt-4">

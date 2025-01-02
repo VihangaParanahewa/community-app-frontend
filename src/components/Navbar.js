@@ -6,6 +6,7 @@ import NotificationsMenu from './NotificationsMenu';
 import ProfileMenu from './ProfileMenu';
 import QuickActionsMenu from './QuickActionsMenu';
 import MobileMenu from './MobileMenu';
+import {useAuthContext} from "../context/AuthContext";
 
 // Main navigation categories
 const navigationConfig = {
@@ -95,7 +96,7 @@ const quickActions = [
   }
 ];
 
-function Navbar({ isAuthenticated, user }) {
+function Navbar({ isAuthenticated , setIsAuthenticated}) {
   // State management
   const [isOpen, setIsOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -138,6 +139,9 @@ function Navbar({ isAuthenticated, user }) {
     }
   ]);
 
+  const authContext = useAuthContext();
+  const user = authContext.currentUser;
+
   // Refs for dropdown menus
   const menuRefs = {
     profile: useRef(null),
@@ -179,8 +183,10 @@ function Navbar({ isAuthenticated, user }) {
   }, [activeDropdown]);
 
   // Navigation helpers
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await authContext.logout();
     localStorage.removeItem('auth_token');
+    setIsAuthenticated(false);
     navigate('/login');
     setShowProfileMenu(false);
   };
@@ -354,10 +360,11 @@ function Navbar({ isAuthenticated, user }) {
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 
                     flex items-center justify-center">
                     <span className="text-blue-600 font-medium">
-                      {user?.name?.[0] || 'U'}
+
+                      {user?.displayName?.[0] || 'U'}
                     </span>
                   </div>
-                  <span className="text-gray-700">{user?.name?.split(' ')[0]}</span>
+                  <span className="text-gray-700">{user?.displayName?.split(' ')[0]}</span>
                 </button>
 
                 {/* Profile Dropdown */}

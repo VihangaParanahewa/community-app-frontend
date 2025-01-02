@@ -18,6 +18,7 @@ import TeachSkill from './pages/skill-share/TeachSkill';
 import LearnSkill from './pages/skill-share/LearnSkill';
 import PlaydateSearch from './pages/kids/playdates/PlaydateSearch';
 import HostPlaydate from './pages/kids/playdates/HostPlaydate';
+import {useAuthContext} from "./context/AuthContext";
 // Protected Route Component
 const ProtectedRoute = ({ children, isAuthenticated, loading }) => {
   if (loading) return <LoadingSpinner />;
@@ -29,6 +30,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const authContext =  useAuthContext();
 
   // Check auth status on app load
   useEffect(() => {
@@ -38,11 +40,7 @@ function App() {
       if (token) {
         setIsAuthenticated(true);
         // You can add API call to get user data here
-        setUser({
-          id: '1',
-          name: 'Test User',
-          email: 'test@example.com'
-        });
+        setUser(authContext.currentUser);
       }
       setLoading(false);
     };
@@ -57,7 +55,7 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-100">
-        <Navbar isAuthenticated={isAuthenticated} user={user} />
+        <Navbar isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated}/>
         <main className="pb-12">
           <Routes>
             {/* Public Routes */}
@@ -66,7 +64,7 @@ function App() {
               element={
                 isAuthenticated ? 
                 <Navigate to="/" /> : 
-                <Login setIsAuthenticated={setIsAuthenticated} setUser={setUser} />
+                <Login setIsAuthenticated={setIsAuthenticated}/>
               } 
             />
             <Route 
@@ -74,7 +72,7 @@ function App() {
               element={
                 isAuthenticated ? 
                 <Navigate to="/" /> : 
-                <Register setIsAuthenticated={setIsAuthenticated} setUser={setUser} />
+                <Register/>
               } 
             />
 
